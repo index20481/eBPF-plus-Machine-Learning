@@ -62,15 +62,19 @@ int xdp_process(struct xdp_md *ctx) {
         struct tcphdr *tcp = (void *)ip + ip_header_len;
         if ((void *)tcp + sizeof(*tcp) > data_end)
             return XDP_PASS;
-        sport = tcp->source;
-        dport = tcp->dest;
+        //sport = tcp->source;
+        //dport = tcp->dest;
+        sport = bpf_ntohs(tcp->source);
+        dport = bpf_ntohs(tcp->dest);
         tcp_flags = tcp->syn | tcp->fin << 1;  
     } else if (protocol == IPPROTO_UDP) {
         struct udphdr *udp = (void *)ip + ip_header_len;
         if ((void *)udp + sizeof(*udp) > data_end)
             return XDP_PASS;
-        sport = udp->source;
-        dport = udp->dest;
+        // sport = udp->source;
+        // dport = udp->dest;
+        sport = bpf_ntohs(udp->source);
+        dport = bpf_ntohs(udp->dest);
     }
 
     //stadarded
@@ -125,13 +129,13 @@ int xdp_process(struct xdp_md *ctx) {
         if (tcp_flags & 0x01) {       // SYN
             val->connection_status = 0;
         } else if (val->connection_status == 0) {
-            val->connection_status = 1;  // ESTABLISHED
+            val->connection_status = 1;  
         }
         if (tcp_flags & 0x02) {       // FIN
             val->connection_status = 2;
         }
     } else {
-        val->connection_status = 3;  // UDP标记
+        val->connection_status = 3;  // UDP
     }
 
     // ipaddr

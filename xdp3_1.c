@@ -63,15 +63,15 @@ int xdp_process(struct xdp_md *ctx) {
         struct tcphdr *tcp = (void *)ip + ip_header_len;
         if ((void *)tcp + sizeof(*tcp) > data_end)
             return XDP_PASS;
-        sport = tcp->source;
-        dport = tcp->dest;
+        sport = bpf_ntohs(tcp->source);
+        dport = bpf_ntohs(tcp->dest);
         tcp_flags = ((u8 *)tcp)[13]; 
     } else if (protocol == IPPROTO_UDP) {
         struct udphdr *udp = (void *)ip + ip_header_len;
         if ((void *)udp + sizeof(*udp) > data_end)
             return XDP_PASS;
-        sport = udp->source;
-        dport = udp->dest;
+        sport = bpf_ntohs(udp->source);
+        dport = bpf_ntohs(udp->dest);
     }
 
     // standard
