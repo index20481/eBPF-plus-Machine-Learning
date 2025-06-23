@@ -97,10 +97,6 @@ def export_flow_features():
             init_win = value.init_win_fwd if key.protocol == socket.IPPROTO_TCP else -1
             features = np.array([duration, pkt_per_sec, byte_per_sec, avg_fwd, value.max_fwd_len, key.sport, init_win]).reshape(1, -1)
             pred = label_encoder.inverse_transform(model.predict(scaler.transform(features)))[0]
-            if pred == 'MSSQL':
-                pred = 'BENIGN'
-            if pred == 'NetBIOS':
-                pred = 'BENIGN' 
             src_ip = int_to_ip(value.src_ip)
             dst_ip = int_to_ip(value.dst_ip)
             print(f"INF:{src_ip}:{key.sport} -> {dst_ip}:{key.dport} Proto={proto} | Type:{pred}")
